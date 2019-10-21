@@ -1,1 +1,1 @@
-# JIni.github.io
+# Jini.github.io
