@@ -1,0 +1,71 @@
+AVLNode *a = root;
+	AVLNode *b = NULL, *c = NULL; //b is child node of a, c is child node of b
+	AVLNode *pa = NULL, *p_cur = NULL; //pa is parent of a, pp is parent of cur
+
+
+	AVLNode *cur; //moves through the tree
+	AVLNode *rootSub = NULL;
+
+	AVLNode *newNode; //newNode to be inserted
+	if ((newNode = new AVLNode()) == NULL) //when allocation is false
+		return false;
+
+	newNode->SetCityData(node);
+
+	if (root == NULL) //when tree is empty
+	{
+		Setroot(newNode);
+		root->mBF = 0;
+		return true;
+	}
+
+	cur = root;
+	while (cur) //find a place where to insert newNode
+	{
+		if (cur->mBF != 0) { a = cur;  pa = p_cur; }
+		if (strcmp(newNode->pCityData->name, cur->pCityData->name) < 0) {p_cur = cur; cur = cur->GetLeft();}
+		else  { p_cur = cur; cur = cur->GetRight(); }
+	}
+
+	if (strcmp(newNode->pCityData->name, p_cur->pCityData->name) < 0) { p_cur->SetLeft(newNode); } //insert newNode
+	else p_cur->SetRight(newNode);
+
+	//after inserting, checking balance factor
+	int d = 0; //presents bf
+
+	if (strcmp(newNode->pCityData->name, a->pCityData->name) > 0) {b = cur = a->GetRight(); d = -1; }
+	else { b = cur = a->GetLeft(); d = 1; }
+
+	while (cur != newNode)
+	{
+		if (strcmp(newNode->pCityData->name, cur->pCityData->name) > 0) { cur->mBF = -1; cur = cur->GetRight(); }
+		else { cur->mBF = 1; cur = cur->GetLeft(); }
+	}
+
+	//is tree unbalanced?
+	if (a->mBF == 0 || a->mBF + d == 0) //tree still balanced
+	{
+		a->mBF += d;
+		return true;
+	}
+	 
+	//tree unbalanced -> rotation
+	if (d == 1) //left imbalance
+	{
+		if (b->mBF == 1)
+			rootSub = LL_rotation(a, b, c);
+		else
+			rootSub = LR_rotation(a, b, c);
+	}
+	else //right imbalance (d==-1)
+	{
+		if (b->mBF == -1)
+			rootSub = RR_rotation(a, b, c);
+		else
+			rootSub = RL_rotation(a, b, c);
+	}
+
+	if (pa == NULL) root = rootSub;
+	else if (a == pa->GetLeft()) pa->SetLeft(rootSub);
+	else pa->SetRight(rootSub);
+	return true;
